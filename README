@@ -1,0 +1,23 @@
+This is meant to build a SQL data base from the given tabbed-separated
+voter data ( download from http://flvoters.com/downloads.html ).
+
+The program will accept the data from stdin, so a normal process to
+get your sqlite3 database is as follows:
+
+(1) clone this repo
+
+(2) download tab separated voter registration data
+
+(3) put your sqlite3.c and sqlite3.h files in the sqlite3 directory,
+or alternatively use the tarball that is in this repo
+
+(4) compile with `make`
+
+(5) $ cat /path/to/voter_data/*.txt | ./main.run voters.db3
+
+(6) analyze data with $ sqlite3 voters.db3, or your favorite sqlite
+compatible software
+
+note: the pre_init.sql and post_init.sql files run before and after
+the data is read from stdin, you can modify them if you wish! They
+create the table (pre init) and the indices (post init).

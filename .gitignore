@@ -1,0 +1,11 @@
+*.o
+*.app
+*.out
+*.swp
+*.run
+*.bin
+*.db3
+*.db
+sqlite3.h
+sqlite3.c
+
