@@ -1,5 +1,8 @@
+//#define DEBUG
 #include "common.hpp"
+#ifdef DEBUG
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <cctype>
 
@@ -7,6 +10,33 @@ static void trim_front(char *&str)
 {
 	while (*str == ' ')
 		++str;
+}
+
+static void trim_end(char *str)
+{
+	char *end = str + strlen(str) - 1;
+	while (end != str && *end == ' ') {
+		*end = '\0';
+		--end;
+	}
+}
+
+
+static void lower_case(char *str)
+{
+	for (char *c = str; *c; ++c) {
+		*c = std::tolower(*c);
+	}
+}
+
+static void fmt_date(char *str)
+{
+	// puts in yyyy-mm-dd format
+	// allows easier sorting
+	int month, day, year;
+	if (sscanf(str, "%d/%d/%d", &month, &day, &year) != 3)
+		return;
+	sprintf(str, "%04d-%02d-%02d", year, month, day);
 }
 
 static void delim(char *line, char **ptr)
@@ -28,13 +58,12 @@ static void delim(char *line, char **ptr)
 	}
 	for (i = 0; i < 38; ++i) {
 		trim_front(ptr[i]);
-	}
-}
-
-static void lower_case(char *str)
-{
-	for (char *c = str; *c; ++c) {
-		*c = std::tolower(*c);
+		trim_end(ptr[i]);
+		if (i == 21 || i == 22) {
+			fmt_date(ptr[i]);
+		} else {
+			lower_case(ptr[i]);
+		}
 	}
 }
 
@@ -54,7 +83,7 @@ static inline void read_stdin()
 		char *ptr[38];
 		delim(line, ptr);
 		for (int i = 1; i <= 38; ++i) {
-			lower_case(ptr[i - 1]);
+			trace(ptr[i - 1]);
 			sqlite3_bind_text(stmt, i, ptr[i - 1], -1, SQLITE_STATIC);
 		}
 		db_step_all(stmt);
@@ -70,6 +99,9 @@ int main(int argc, char **argv)
 	if (argc < 2) {
 		fatal("provide db name as an argument");
 	}
+#ifdef DEBUG
+	unlink(argv[1]);
+#endif
 	if (sqlite3_open(argv[1], &db)) {
 		trace(sqlite3_errmsg(db));
 		fatal("can't open database");
