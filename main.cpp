@@ -83,7 +83,6 @@ static inline void read_stdin()
 		char *ptr[38];
 		delim(line, ptr);
 		for (int i = 1; i <= 38; ++i) {
-			trace(ptr[i - 1]);
 			sqlite3_bind_text(stmt, i, ptr[i - 1], -1, SQLITE_STATIC);
 		}
 		db_step_all(stmt);
